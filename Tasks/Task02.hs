@@ -130,6 +130,28 @@ safeRoot (Just n)
 
 -- Warum ist es Sinnvoll? Man muss bei der Division keine Gültigkeit checken, es wird immer ein gültiges Ergebnis geliefert
 
+--2.5
+
+data ListInt = ListInt [Int] Int deriving(Show)
+
+create :: [Int] -> ListInt
+create [] = [] 0
+create [h] = ListInt h (sum h)
+
+
+getList :: ListInt -> [Int]
+getList (ListInt h n) = h
+
+getSum :: ListInt -> Int
+getSum (ListInt h n) = n
+
+add :: Int -> ListInt -> ListInt
+add n (ListInt h m) =  ListInt (n:h) (n+m)
+
+liconcat :: ListInt -> ListInt -> ListInt
+
+
+
 
 
 --2.4:
