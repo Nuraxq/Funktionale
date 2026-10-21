@@ -30,7 +30,6 @@ buy amount
     | otherwise = EmptyJetons    
 
 
-data Format = Flushleft | Flushright
 {-
 -- Dachte ich brauche das aber anscheinend nicht
 takeUntil :: String -> Char -> Int -> String
@@ -67,36 +66,71 @@ takeWordsUntil s n curr
 
 -- Versuch 3 Wortliste erstmal anlegen
 
-
-
 data Words = EmptyWords | NotEmptyWords String Words 
 
+data Format = Flushleft | Flushright
 
 takeWord :: String -> String
 takeWord s 
     | s == "" = ""
+
     | head s == ' ' = ""
     | otherwise = head s : takeWord (tail s) 
 
-
+-- Trennt einen Satz in Wörter 
 fillWords :: String -> Words
 fillWords s     
     | s == "" = EmptyWords
     | head s == ' ' = fillWords (tail s)
     | otherwise = NotEmptyWords (takeWord s) (fillWords (drop (length (takeWord s)) s))
 
+-- Macht basically ganz Flush left. Kriegt eine Wort Liste geben und erzeugt daraus die Linksbündige Formattierung
+flHelper :: Words -> Int -> String -> Int -> String
+flHelper EmptyWords _ _ _= ""
+flHelper (NotEmptyWords s rest) n curr maxLen
+    | null curr = s ++ flHelper rest (n-(length s)) s maxLen -- Wort ist alleine in der Zeile
+    | (length s) < n = " " ++ s ++ flHelper rest (n-(length s)-1) s maxLen -- Wort passt noch rein
+    | otherwise = "\n" ++ flHelper (NotEmptyWords s rest) maxLen "" maxLen -- Wort passt nicht rein 
 
-getWordsUntil :: Words -> Int -> String -> Int -> String
-getWordsUntil EmptyWords _ _ _= ""
-getWordsUntil (NotEmptyWords s rest) n curr maxLen
-    | null curr = s ++ getWordsUntil rest (n-(length s)) s maxLen
-    | (length s) < n = " " ++ s ++ getWordsUntil rest (n-(length s)-1) s maxLen
-    | otherwise = "\n" ++ getWordsUntil (NotEmptyWords s rest) maxLen "" maxLen
+-- Wird mit lines aufgerufen
+-- Füllt einzeln jede Zeile auf und konkateniert am Ende alles
+frHelper :: [String] -> Int ->  String
+frHelper [] _ = ""
+frHelper [h] n = fillLeft h n 
+frHelper (h:t) n = (fillLeft h n) ++ "\n" ++ frHelper t n 
+
+-- Füllt auf Länge n auf
+fillLeft :: String -> Int -> String
+fillLeft s n 
+    | length s >= n = s  
+    | otherwise = (replicate (n-(length s)) ' ') ++ s
+
 
 align :: Format -> Int -> String -> String
 
-align Flushleft n s = getWordsUntil (fillWords s) n "" n  
+align Flushleft n s = flHelper (fillWords s) n "" n  
 
-align Flushright _ _ = ""
+align Flushright n s = frHelper (lines (flHelper (fillWords s) n "" n)) n  
 
 
+--2.3
+
+safeDiv :: Maybe Double -> Maybe Double -> Maybe Double
+safeDiv Nothing Nothing = Nothing
+safeDiv Nothing _ = Nothing
+safeDiv _ Nothing = Nothing
+safeDiv _ (Just 0) = Nothing
+safeDiv (Just n) (Just m) = Just(n/m)
+
+safeRoot :: Maybe Double -> Maybe Double
+safeRoot Nothing = Nothing
+safeRoot (Just n) 
+    | n < 0 = Nothing
+    | n >= 0 = sqrt n
+
+-- Warum ist es Sinnvoll? Man muss bei der Division keine Gültigkeit checken, es wird immer ein gültiges Ergebnis geliefert
+
+
+
+--2.4:
+-- Das 0-Tuple gibt es auch noch (), er hat immer den gleichen Wert. Er ist Sinnvoll wenn man nichts zurückgeben kann wie bei einer IO operation. In Haskell muss jedoch jede Funktion etwas zurückgeben. 
