@@ -149,6 +149,7 @@ add :: Int -> ListInt -> ListInt
 add n (ListInt h m) =  ListInt (n:h) (n+m)
 
 liconcat :: ListInt -> ListInt -> ListInt
+liconcat (ListInt l1 n1) (ListInt l2 n2) = (ListInt l1:l2 n1+n2)
 
 
 
