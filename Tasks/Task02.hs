@@ -1,7 +1,7 @@
 -- Aufgabe 2.1
 
 data Jeton = RedJeton | GreenJeton | BlueJeton | SilverJeton | GoldJeton
-    
+
 value RedJeton = 1
 value GreenJeton = 5
 value BlueJeton = 10
@@ -66,6 +66,7 @@ takeWordsUntil s n curr
 
 -- Versuch 3 Wortliste erstmal anlegen
 
+
 data Words = EmptyWords | NotEmptyWords String Words 
 
 data Format = Flushleft | Flushright
@@ -73,7 +74,6 @@ data Format = Flushleft | Flushright
 takeWord :: String -> String
 takeWord s 
     | s == "" = ""
-
     | head s == ' ' = ""
     | otherwise = head s : takeWord (tail s) 
 
@@ -84,7 +84,7 @@ fillWords s
     | head s == ' ' = fillWords (tail s)
     | otherwise = NotEmptyWords (takeWord s) (fillWords (drop (length (takeWord s)) s))
 
--- Macht basically ganz Flush left. Kriegt eine Wort Liste geben und erzeugt daraus die Linksbündige Formattierung
+-- Macht basically ganz Flush left. Kriegt eine Wort Liste geben und erzeugt daraus die Linksbündige Formatierung
 flHelper :: Words -> Int -> String -> Int -> String
 flHelper EmptyWords _ _ _= ""
 flHelper (NotEmptyWords s rest) n curr maxLen
@@ -126,7 +126,7 @@ safeRoot :: Maybe Double -> Maybe Double
 safeRoot Nothing = Nothing
 safeRoot (Just n) 
     | n < 0 = Nothing
-    | n >= 0 = sqrt n
+    | n >= 0 = Just (sqrt n)
 
 -- Warum ist es Sinnvoll? Man muss bei der Division keine Gültigkeit checken, es wird immer ein gültiges Ergebnis geliefert
 
@@ -135,25 +135,26 @@ safeRoot (Just n)
 data ListInt = ListInt [Int] Int deriving(Show)
 
 create :: [Int] -> ListInt
-create [] = [] 0
-create [h] = ListInt h (sum h)
+create [] = ListInt [] 0
+create h = ListInt h (sum h)
 
 
 getList :: ListInt -> [Int]
-getList (ListInt h n) = h
+getList (ListInt h _) = h
 
 getSum :: ListInt -> Int
-getSum (ListInt h n) = n
+getSum (ListInt _ n) = n
 
 add :: Int -> ListInt -> ListInt
 add n (ListInt h m) =  ListInt (n:h) (n+m)
 
 liconcat :: ListInt -> ListInt -> ListInt
-liconcat (ListInt l1 n1) (ListInt l2 n2) = (ListInt l1:l2 n1+n2)
-
-
-
+liconcat (ListInt l1 n1) (ListInt l2 n2) = (ListInt (l1++l2) (n1+n2))
 
 
 --2.4:
--- Das 0-Tuple gibt es auch noch (), er hat immer den gleichen Wert. Er ist Sinnvoll wenn man nichts zurückgeben kann wie bei einer IO operation. In Haskell muss jedoch jede Funktion etwas zurückgeben. 
+-- Das 0-Tuple gibt es auch noch (), er hat immer den gleichen Wert. 
+--Er ist Sinnvoll wenn man nichts zurückgeben kann wie bei einer IO operation. 
+--In Haskell muss jedoch jede Funktion etwas zurückgeben. 
+
+
