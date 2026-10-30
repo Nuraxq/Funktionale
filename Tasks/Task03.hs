@@ -70,32 +70,32 @@ instance Eq a => Eq (Component a) where
 
 contains :: Eq a => Storage a -> a -> Maybe Natural
 contains [] comp = Nothing
-contains ((Component a n) : tail) searchVal
+contains ((Component a n) : rest) searchVal
     | a == searchVal = Just n
-    | otherwise = contains tail searchval
+    | otherwise = contains rest searchVal
 
 store :: Eq a => Storage a -> a -> Natural -> Storage a
 store [] searchVal number =  [(Component searchVal number)]
-store ((Component a n): tail) searchVal number
-    | a == searchVal = (Component a (n+number)) : tail -- gefunden
-    | otherwise = (Component a n) : store tail searchVal number
+store ((Component a n): rest) searchVal number
+    | a == searchVal = (Component a (n+number)) : rest -- gefunden
+    | otherwise = (Component a n) : store rest searchVal number
 
 
-remove :: Eq a => Storage a -> a -> Natural -> Storage a1
+remove :: Eq a => Storage a -> a -> Natural -> Storage a
 remove [] _ _ = []
-remove ((Component a n ): tail) searchval number
-    | a == searchVal && n > number = (Component a (n-number)) : tail
-    | a == searchVal && n <= number = tail
-    | otherwise = (Component a n) : store tail searchVal number
+remove ((Component a n ): rest) searchVal number
+    | a == searchVal && n > number = (Component a (n-number)) : rest
+    | a == searchVal && n <= number = rest
+    | otherwise = (Component a n) : remove rest searchVal number
 
 
 
 isProducible :: (Eq a, Eq b) => Product a b -> Storage b -> Bool
 isProducible (Product a []) _ = True 
 isProducible _ [] = False
-isProducible (Product name ((ingred_name, ingred_amount):tail)) storage 
-    | contains ingred_name storage == Nothing = False 
-    | contains ingred_name storage >= Just ingred_amount = isProducible (Product name tail) storage
+isProducible (Product name ((ingredName, ingred_amount):rest)) storage 
+    | contains storage ingredName  == Nothing = False 
+    | contains storage ingredName  >= Just ingred_amount = isProducible (Product name rest) storage
     | otherwise = False
 
 produce :: (Eq a, Eq b) => Product a b -> Storage b -> Storage b
@@ -117,10 +117,10 @@ ghci> tail [1] == ""
     * No instance for `Num Char' arising from the literal `1'
     * In the expression: 1
       In the first argument of `tail', namely `[1]'
-      In the first argument of `(==)', namely `tail [1]'
+      In the first argument of `(==)', namely `rest [1]'
 
 
--> Fehler da [1] eine Int liste ist und tail eine leere int liste zurückgibt. == braucht jedoch zwei listen gleichen typs
+-> Fehler da [1] eine Int liste ist und rest eine leere int liste zurückgibt. == braucht jedoch zwei listen gleichen typs
 
 ghci> tail [1] == []
 <interactive>:3:1: warning: [GHC-63394] [-Wx-partial]
@@ -154,8 +154,8 @@ createSet list = Set (createSet' list [])
         createSet' [] curr = curr
 
 
-union :: Eq a => Set a -> Set a -> Set a
-union (Set a) (Set b) = createSet (a ++ b)
+myUnion :: Eq a => Set a -> Set a -> Set a
+myUnion (Set a) (Set b) = createSet (a ++ b)
 
 
 intersection :: Eq a => Set a -> Set a -> Set a
@@ -172,4 +172,26 @@ setMinus :: Eq a => Set a -> Set a -> Set a
 setMinus (Set []) _ = Set []
 setMinus (Set (h:t)) (Set b)
     | elem h b = setMinus (Set t) (Set b)
-    | otherwise = union (Set h) (setMinus (Set t) (Set b))
+    | otherwise = myUnion (Set [h]) (setMinus (Set t) (Set b))
+
+
+isSubsetOf :: Eq a => Set a -> Set a -> Bool
+isSubsetOf (Set (h:t)) (Set list) 
+    | elem h list = isSubsetOf (Set t) (Set list)
+    | otherwise = False
+isSubsetOf (Set []) (Set list) = True
+
+
+instance Eq a => Eq (Set a) where
+    (Set a) == (Set b) = (length a == length b) && isSubsetOf (Set a) (Set b)
+
+instance Eq a => Ord (Set a) where
+    (Set a) <= (Set b) =  isSubsetOf (Set a) (Set b)
+    (Set a) < (Set b) =  isSubsetOf (Set a) (Set b) && (Set a) /= (Set b) 
+
+instance Show a => Show (Set a) where
+    show (Set [])     = "{}"
+    show (Set (x:xs)) = "{" ++ show x ++ helper xs ++ "}"
+      where
+        helper []     = ""
+        helper (y:ys) = "," ++ show y ++ helper ys
