@@ -19,7 +19,7 @@ mSplitL (number:rest) list = take (number+1) list : mSplitL' (drop (number+1) li
 --3.2 
 sortier :: Ord a => [a] -> [a]
 sortier [] = []
-sortier list = minimum list : sortier (del (minimum list) list)
+sortier liste = minimum liste : sortier (del (minimum liste) liste)
 
 
 del :: Eq a => a -> [a] -> [a]
@@ -101,7 +101,6 @@ isProducible (Product name ((ingredName, ingred_amount):rest)) storage
 produce :: (Eq a, Eq b) => Product a b -> Storage b -> Storage b
 produce (Product a ((name, num):t)) storage = produce (Product a t) (remove storage name num)
 produce (Product a []) storage = storage
-produce _ [] = []
 
 
 --3.4
