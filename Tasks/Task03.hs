@@ -80,7 +80,7 @@ store ((Component a n): rest) searchVal number
     | a == searchVal = (Component a (n+number)) : rest -- gefunden
     | otherwise = (Component a n) : store rest searchVal number
 
-
+    
 remove :: Eq a => Storage a -> a -> Natural -> Storage a
 remove [] _ _ = []
 remove ((Component a n ): rest) searchVal number
@@ -91,17 +91,16 @@ remove ((Component a n ): rest) searchVal number
 
 
 isProducible :: (Eq a, Eq b) => Product a b -> Storage b -> Bool
-isProducible (Product a []) _ = True 
+isProducible (Product _ []) _ = True 
 isProducible _ [] = False
-isProducible (Product name ((ingredName, ingred_amount):rest)) storage 
+isProducible (Product name ((ingredName, ingredAmount):rest)) storage 
     | contains storage ingredName  == Nothing = False 
-    | contains storage ingredName  >= Just ingred_amount = isProducible (Product name rest) storage
+    | contains storage ingredName  >= Just ingredAmount = isProducible (Product name rest) storage
     | otherwise = False
 
 produce :: (Eq a, Eq b) => Product a b -> Storage b -> Storage b
 produce (Product a ((name, num):t)) storage = produce (Product a t) (remove storage name num)
 produce (Product a []) storage = storage
-produce _ [] = []
 
 
 --3.4
