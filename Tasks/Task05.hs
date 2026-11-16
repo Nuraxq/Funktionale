@@ -83,3 +83,31 @@ instance Functor Seq where
     fmap f (Pseq (a1,a2) rest) = Pseq (f a1, f a2) (fmap f rest)
 
 
+--5.5 
+{-
+class Bifunctor p where
+    bimap :: (a -> b) -> (c -> d) -> p a c -> p b d
+
+Nimmt eine Funktion von a nach b und eine von c nach d, um dann für einen Typkonstruktor mit Kind Type->Type->Type map bereitzustellen. 
+Dabei wird der erste Typparameter mit der ersten Funktion gemappt, der zweite Typparameter mit der zweitem 
+
+class Bifoldable p where
+    bifoldr :: (a -> c -> c) -> (b -> c -> c) -> c -> p a b -> c
+Bei Fold, werden für einen Typkonstruktor mit Kind Type->Type->Type zwei Funktionen genommen die beide den gleichen Typ c als Ergebnis haben.
+Sie nehmen jeweils ein Akkumulator vom Typ c. 
+Dann werden die Typen a und b jeweils in ein Datum vom Typ c umgewandelt und zusammen gefoldet
+-}
+
+instance Bifunctor Either_ where
+    bimap f _ (Left_ a) = Left_ (f a)
+    bimap _ g (Right_ b) = Right_ (g b) 
+
+instance Bifunctor Pair where
+    bimap f g (Pair a b) = Pair (f a) (g b)
+
+instance Bifoldable Either_ where 
+    bifoldr _ g s (Right_ b) = g b s
+    bifoldr f _ s (Left_ a) = f a s 
+
+instance Bifoldable Pair where
+    bifoldr f g s (Pair a b) = (f a (g b s))
