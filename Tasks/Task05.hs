@@ -89,7 +89,7 @@ class Bifunctor p where
     bimap :: (a -> b) -> (c -> d) -> p a c -> p b d
 
 Nimmt eine Funktion von a nach b und eine von c nach d, um dann für einen Typkonstruktor mit Kind Type->Type->Type map bereitzustellen. 
-Dabei wird der erste Typparameter mit der ersten Funktion gemappt, der zweite Typparameter mit der zweitem 
+Dabei wird der erste Typparameter mit der ersten Funktion gemappt, der zweite Typparameter mit der zweite
 
 class Bifoldable p where
     bifoldr :: (a -> c -> c) -> (b -> c -> c) -> c -> p a b -> c
