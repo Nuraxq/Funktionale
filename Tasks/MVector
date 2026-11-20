@@ -1,0 +1,29 @@
+module MVector(
+    MVector,
+    vectorFromList,
+    scalarMult,
+    vecAdd,
+    vecProd,
+    crossProd
+) where
+
+
+newtype Vector a = Vector [a]
+crossProd :: Num a => Vector a -> Vector a -> Maybe (Vector a)
+
+
+vectorFromList :: Num a => [a] -> Vector a
+vectorFromList l = Vector l
+
+vecAdd :: Num a => Vector a -> Vector a -> Maybe (Vector a)
+vecAdd (Vector v1) (Vector v2) 
+    | length v1 /= length v2 = Nothing
+    | otherwise = Just (Vector (vecAdd' v1 v2))
+    where
+        vecAdd' (x:xs) (n:ns) = (x+n) : (vecAdd' xs ns)
+        vecAdd' _ _ = []
+
+scalarMult :: Num a => a -> Vector a -> Vector a
+scalarMult zahl (Vector a) = map * a zahl
+
+vecProd :: Num a => Vector a -> Vector a -> Maybe a
